@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from io import StringIO
 from pathlib import Path
+from urllib.parse import quote
 
 import pandas as pd
 import plotly.express as px
@@ -227,6 +228,52 @@ def structure_browser(df: pd.DataFrame) -> None:
     st.code(smiles, language="text")
 
 
+def lipid_page_url(il_id: str) -> str:
+    return f"./Lipid_Viewer?il_id={quote(il_id)}"
+
+
+def lipid_launcher(df: pd.DataFrame) -> None:
+    if "il_id" not in df.columns:
+        return
+
+    lipids = filtered_options(df["il_id"])
+    if not lipids:
+        return
+
+    left, right = st.columns([3, 1])
+    selected_il = left.selectbox("Lipid page", lipids)
+    if right.button("Open structure page", width="stretch"):
+        st.query_params["il_id"] = selected_il
+        st.switch_page("pages/1_Lipid_Viewer.py")
+
+
+def dataset_table(df: pd.DataFrame) -> None:
+    display_df = df.copy()
+    column_config = {}
+
+    if "il_id" in display_df.columns:
+        display_df.insert(
+            0,
+            "lipid_page",
+            display_df["il_id"].fillna("").astype(str).apply(
+                lambda value: lipid_page_url(value) if value.strip() else ""
+            ),
+        )
+        column_config["lipid_page"] = st.column_config.LinkColumn(
+            "Open",
+            display_text="View lipid",
+            help="Open this ionizable lipid on the structure page.",
+        )
+
+    st.dataframe(
+        display_df,
+        width="stretch",
+        height=520,
+        hide_index=True,
+        column_config=column_config,
+    )
+
+
 uploaded_file = st.sidebar.file_uploader("Upload a curated LNPhub CSV", type=["csv"])
 
 if uploaded_file is not None:
@@ -246,7 +293,8 @@ show_metric_row(filtered_data)
 tab_table, tab_structures, tab_plots = st.tabs(["Dataset", "Structures", "Plots"])
 
 with tab_table:
-    st.dataframe(filtered_data, width="stretch", height=520)
+    lipid_launcher(filtered_data)
+    dataset_table(filtered_data)
     csv = filtered_data.to_csv(index=False).encode("utf-8")
     st.download_button(
         "Download filtered CSV",
