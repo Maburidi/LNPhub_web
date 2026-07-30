@@ -6,6 +6,8 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from lnphub_ui import configure_page, render_top_nav
+
 try:
     from rdkit import Chem
     from rdkit.Chem import Draw
@@ -79,11 +81,7 @@ OUTCOME_COLUMNS = [
 ]
 
 
-st.set_page_config(
-    page_title="LNPhub Lipid Viewer",
-    page_icon=":test_tube:",
-    layout="wide",
-)
+configure_page("Lipid Viewer")
 
 
 @st.cache_data(show_spinner=False)
@@ -142,7 +140,8 @@ data = load_csv()
 lipids = filtered_options(data["il_id"]) if "il_id" in data.columns else []
 requested_il = query_value("il_id")
 
-st.page_link("streamlit_app.py", label="Back to dataset", icon=":material/table:")
+render_top_nav("Lipid Viewer")
+st.page_link("pages/2_Start.py", label="Back to Start", icon=":material/table:")
 st.title("Lipid Viewer")
 
 if not lipids:
