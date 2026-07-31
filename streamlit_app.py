@@ -8,7 +8,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from lnphub_ui import configure_page, render_brand_header
+from lnphub_ui import configure_page, inject_menu_logo, render_home_banner
 
 try:
     from rdkit import Chem
@@ -171,7 +171,7 @@ OUTCOME_COLUMNS = [
 
 
 configure_page("Portal")
-render_brand_header()
+inject_menu_logo()
 
 
 @st.cache_data(show_spinner=False)
@@ -302,19 +302,7 @@ def dataset_table(df: pd.DataFrame) -> None:
 
 
 def render_home(data: pd.DataFrame) -> None:
-    st.markdown(
-        """
-        <section class="lnp-hero">
-            <div class="lnp-kicker">Curated lipid nanoparticle data portal</div>
-            <h1>LNP-Hub</h1>
-            <p class="lnp-lede">
-                A public-facing Streamlit portal for exploring curated lipid nanoparticle
-                formulation, chemistry, delivery, and assay outcome records.
-            </p>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
+    render_home_banner()
 
     show_metric_row(data)
 

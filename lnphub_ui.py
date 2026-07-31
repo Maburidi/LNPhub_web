@@ -7,7 +7,8 @@ import streamlit as st
 
 
 APP_NAME = "LNP-Hub"
-LOGO_PATH = Path("assets/logo.png")
+LOGO_PATH = Path("assets/logo2_2.png")
+BANNER_PATH = Path("assets/banner_head.png")
 
 NAV_ITEMS = [
     ("Home", "./"),
@@ -24,16 +25,22 @@ def configure_page(page_title: str) -> None:
         page_title=f"{page_title} | {APP_NAME}",
         page_icon=":test_tube:",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="collapsed",
     )
     inject_theme()
 
 
-@st.cache_data(show_spinner=False)
 def logo_data_uri() -> str:
     if not LOGO_PATH.exists():
         return ""
     encoded = base64.b64encode(LOGO_PATH.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
+def image_data_uri(path: Path) -> str:
+    if not path.exists():
+        return ""
+    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
     return f"data:image/png;base64,{encoded}"
 
 
@@ -72,8 +79,10 @@ def inject_theme() -> None:
             }
 
             .block-container {
-                padding-top: 0.35rem;
-                max-width: 1180px;
+                padding-top: 0;
+                padding-left: 1.4rem;
+                padding-right: 1.4rem;
+                max-width: 1540px;
             }
 
             .lnp-topbar {
@@ -152,10 +161,10 @@ def inject_theme() -> None:
             .stTabs [data-baseweb="tab-list"],
             .stTabs [role="tablist"] {
                 align-items: center;
-                background: rgba(255, 255, 255, 0.82);
-                border: 1px solid rgba(217, 229, 226, 0.95);
+                background: linear-gradient(135deg, #063638, #0b5558 56%, #083f43);
+                border: 1px solid rgba(127, 212, 202, 0.34);
                 border-radius: 8px;
-                box-shadow: 0 10px 30px rgba(18, 60, 105, 0.08);
+                box-shadow: 0 12px 34px rgba(0, 106, 113, 0.2);
                 display: flex;
                 gap: 4px;
                 margin: 0 0 24px;
@@ -169,7 +178,7 @@ def inject_theme() -> None:
             .stTabs [data-baseweb="tab"],
             .stTabs [role="tab"] {
                 border-radius: 6px;
-                color: var(--lnp-blue);
+                color: rgba(231, 255, 250, 0.86);
                 font-weight: 700;
                 min-height: 42px;
                 padding: 0 14px;
@@ -178,14 +187,14 @@ def inject_theme() -> None:
 
             .stTabs [data-baseweb="tab"]:hover,
             .stTabs [role="tab"]:hover {
-                background: rgba(0, 106, 113, 0.08);
-                color: var(--lnp-teal);
+                background: rgba(127, 212, 202, 0.13);
+                color: #dffff9;
             }
 
             .stTabs [aria-selected="true"] {
-                background: linear-gradient(135deg, var(--lnp-teal), #218a83);
-                color: #ffffff;
-                box-shadow: 0 6px 16px rgba(0, 106, 113, 0.22);
+                background: linear-gradient(135deg, #d7f2ee, #83dfd2);
+                color: #063638;
+                box-shadow: 0 7px 18px rgba(131, 223, 210, 0.34);
             }
 
             .stTabs [data-baseweb="tab-highlight"] {
@@ -196,8 +205,52 @@ def inject_theme() -> None:
                 padding-top: 2px;
             }
 
+            .lnp-home-banner {
+                background: rgba(255, 255, 255, 0.72);
+                border: 1px solid rgba(217, 229, 226, 0.88);
+                border-radius: 8px;
+                box-shadow: 0 14px 32px rgba(0, 106, 113, 0.1);
+                margin: 0 0 24px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .lnp-home-banner img {
+                display: block;
+                height: auto;
+                width: 100%;
+            }
+
+            .lnp-banner-copy {
+                color: #3f4647;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                left: 184px;
+                position: absolute;
+                top: 34px;
+            }
+
+            .lnp-banner-copy h1 {
+                color: #3f4647;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: clamp(1.8rem, 3.35vw, 3.55rem);
+                font-weight: 300;
+                letter-spacing: 0;
+                line-height: 0.88;
+                margin: 0;
+            }
+
+            .lnp-banner-copy p {
+                color: #3f4647;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: clamp(1.05rem, 1.95vw, 1.8rem);
+                font-weight: 300;
+                line-height: 1.08;
+                margin: -3px 0 0;
+                max-width: 720px;
+            }
+
             .lnp-hero {
-                padding: 42px 0 32px;
+                padding: 20px 0 30px;
             }
 
             .lnp-kicker {
@@ -215,15 +268,17 @@ def inject_theme() -> None:
                 line-height: 1.02;
                 letter-spacing: 0;
                 margin: 0;
-                color: var(--lnp-ink);
+                color: #063638;
+                font-weight: 820;
             }
 
-            .lnp-lede {
+            .lnp-hero p.lnp-lede {
                 max-width: 760px;
-                margin-top: 18px;
-                color: var(--lnp-muted);
-                font-size: 1.12rem;
-                line-height: 1.65;
+                margin-top: 12px;
+                color: #123f43 !important;
+                font-size: clamp(1.18rem, 2vw, 1.7rem) !important;
+                font-weight: 650 !important;
+                line-height: 1.42 !important;
             }
 
             .lnp-band {
@@ -261,6 +316,11 @@ def inject_theme() -> None:
             }
 
             @media (max-width: 720px) {
+                .block-container {
+                    padding-left: 0.75rem;
+                    padding-right: 0.75rem;
+                }
+
                 .lnp-topbar {
                     align-items: flex-start;
                     flex-direction: column;
@@ -275,6 +335,21 @@ def inject_theme() -> None:
                     overflow-x: auto;
                     position: static;
                     white-space: nowrap;
+                }
+
+                .lnp-banner-copy {
+                    left: 32px;
+                    top: 8px;
+                }
+
+                .lnp-banner-copy h1 {
+                    font-size: 1.55rem;
+                }
+
+                .lnp-banner-copy p {
+                    font-size: 0.85rem;
+                    margin-top: -2px;
+                    max-width: 260px;
                 }
             }
         </style>
@@ -309,19 +384,59 @@ def render_top_nav(active: str) -> None:
     )
 
 
-def render_brand_header() -> None:
+def inject_menu_logo() -> None:
     logo = logo_data_uri()
-    logo_html = f'<img src="{logo}" alt="LNP-Hub logo">' if logo else ""
+    if not logo:
+        return
+
+    top_tablist_selector = (
+        '[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] '
+        '> [data-testid="stTabs"] > div:first-child > div:first-child '
+        '> [role="tablist"]'
+    )
+
     st.markdown(
         f"""
-        <div class="lnp-topbar">
-            <a class="lnp-brand" href="./" target="_self" rel="self">
-                {logo_html}
-                <span class="lnp-brand-text">
-                    <span class="lnp-brand-name">LNP-Hub</span>
-                    <span class="lnp-brand-subtitle">Curated nanoparticle commons</span>
-                </span>
-            </a>
+        <style>
+            {top_tablist_selector}::before {{
+                background-image: url("{logo}");
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: contain;
+                content: "";
+                display: inline-block;
+                flex: 0 0 auto;
+                height: 38px;
+                margin: 0 12px 0 4px;
+                width: 128px;
+            }}
+
+            @media (max-width: 720px) {{
+                {top_tablist_selector}::before {{
+                    height: 30px;
+                    margin-right: 8px;
+                    width: 100px;
+                }}
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_home_banner() -> None:
+    banner = image_data_uri(BANNER_PATH)
+    if not banner:
+        return
+
+    st.markdown(
+        f"""
+        <div class="lnp-home-banner">
+            <img src="{banner}" alt="LNP-Hub header banner">
+            <div class="lnp-banner-copy">
+                <h1>Lipid Nanoparticles Hub</h1>
+                <p>Artificial Intelligence for mRNA Therapeutic Science</p>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
