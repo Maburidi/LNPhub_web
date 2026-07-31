@@ -249,6 +249,61 @@ def inject_theme() -> None:
                 max-width: 720px;
             }
 
+            .lnp-portal-tagline {
+                animation: lnp-tagline-rise 650ms ease-out both;
+                background: transparent;
+                border: 0;
+                color: #063638 !important;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+                font-size: 1.92rem !important;
+                font-weight: 400 !important;
+                letter-spacing: 0 !important;
+                line-height: 1.22 !important;
+                margin: -2px auto 28px !important;
+                max-width: 1240px;
+                padding: 0 12px 14px;
+                position: relative;
+                text-align: center;
+                text-shadow: 0 8px 22px rgba(0, 106, 113, 0.12);
+            }
+
+            .lnp-portal-tagline::after {
+                animation: lnp-tagline-glow 4.5s ease-in-out infinite;
+                background: linear-gradient(90deg, rgba(0, 106, 113, 0), rgba(0, 106, 113, 0.68), rgba(127, 212, 202, 0.95), rgba(0, 106, 113, 0));
+                bottom: 0;
+                content: "";
+                height: 2px;
+                left: 22%;
+                position: absolute;
+                right: 22%;
+            }
+
+            .lnp-portal-tagline::before {
+                display: none;
+            }
+
+            @keyframes lnp-tagline-rise {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes lnp-tagline-glow {
+                0%, 100% {
+                    opacity: 0.42;
+                    transform: scaleX(0.72);
+                }
+                50% {
+                    opacity: 1;
+                    transform: scaleX(1);
+                }
+            }
+
             .lnp-ai-intro {
                 color: #3f4647;
                 font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -374,7 +429,6 @@ def inject_theme() -> None:
                 line-height: 1.2;
                 margin-bottom: 12px;
                 position: relative;
-                text-transform: uppercase;
                 z-index: 1;
             }
 
@@ -514,6 +568,11 @@ def inject_theme() -> None:
                     font-size: 0.85rem;
                     margin-top: -2px;
                     max-width: 260px;
+                }
+
+                .lnp-portal-tagline {
+                    font-size: 1.12rem;
+                    margin: -8px auto 14px;
                 }
 
                 .lnp-ai-intro {

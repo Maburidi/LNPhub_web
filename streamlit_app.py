@@ -263,11 +263,29 @@ def structure_svg(smiles: str, width: int = 360, height: int = 240) -> str | Non
 
 
 def show_metric_row(df: pd.DataFrame) -> None:
-    cols = st.columns(4)
-    cols[0].metric("Records", f"{len(df):,}")
-    cols[1].metric("Studies", f"{df['study_id'].nunique():,}" if "study_id" in df else "0")
-    cols[2].metric("Ionizable lipids", f"{df['il_id'].nunique():,}" if "il_id" in df else "0")
-    cols[3].metric("LNPs", f"{df['lnp_id'].nunique():,}" if "lnp_id" in df else "0")
+    metrics = [
+        ("Experimental Records", f"{len(df):,}"),
+        ("Studies", f"{df['study_id'].nunique():,}" if "study_id" in df else "0"),
+        ("Ionizable Lipids", f"{df['il_id'].nunique():,}" if "il_id" in df else "0"),
+        ("LNP Formulations", f"{df['lnp_id'].nunique():,}" if "lnp_id" in df else "0"),
+    ]
+    stat_tiles = "\n".join(
+        f"""
+        <div class="lnp-stat-tile">
+            <div class="lnp-stat-label">{label}</div>
+            <div class="lnp-stat-value">{value}</div>
+        </div>
+        """
+        for label, value in metrics
+    )
+    st.markdown(
+        f"""
+        <section class="lnp-stat-grid">
+            {stat_tiles}
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def lipid_page_url(il_id: str) -> str:
@@ -303,6 +321,16 @@ def dataset_table(df: pd.DataFrame) -> None:
 
 def render_home(data: pd.DataFrame) -> None:
     render_home_banner()
+
+    st.markdown(
+        """
+        <h2 class="lnp-portal-tagline">
+            LNP-Hub: Enabling Structure&ndash;Function Modeling, AI-Driven LNP Discovery,
+            and Next-Generation mRNA Delivery
+        </h2>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown(
         """
