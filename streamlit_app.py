@@ -304,6 +304,44 @@ def dataset_table(df: pd.DataFrame) -> None:
 def render_home(data: pd.DataFrame) -> None:
     render_home_banner()
 
+    st.markdown(
+        """
+        <p class="lnp-ai-intro">
+            Artificial intelligence is emerging as a powerful foundation for the rational design of lipid nanoparticles
+            and the next generation of mRNA therapeutics. By integrating lipid structure, formulation composition,
+            manufacturing conditions, and biological performance, AI can uncover complex relationships that are
+            difficult to resolve through conventional experimentation alone. These models can guide the selection
+            and optimization of ionizable lipids, predict critical properties such as potency, stability,
+            biodistribution, tissue selectivity, and tolerability, and help prioritize the most promising formulations
+            before costly experimental validation. By reducing empirical trial and error while complementing
+            mechanistic insight, AI has the potential to accelerate LNP discovery, improve the precision and safety
+            of mRNA delivery, and enable the development of more effective and broadly accessible RNA medicines.
+        </p>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <section class="lnp-foundation-box">
+            <p>
+                LNP-Hub is designed to provide the data foundation needed to advance artificial intelligence-driven
+                lipid nanoparticle discovery and mRNA therapeutics. By bringing together standardized information on
+                lipid structures, formulation composition, manufacturing conditions, physicochemical properties,
+                biological models, delivery performance, and safety, LNP-Hub transforms fragmented experimental
+                evidence into a structured and machine-readable resource. This integrated framework will support the
+                development, benchmarking, and validation of predictive and generative AI models, enabling researchers
+                to identify structure-function relationships, prioritize promising ionizable lipids and formulations,
+                and reduce dependence on costly trial-and-error experimentation. By connecting high-quality data with
+                computational design and experimental validation, LNP-Hub aims to accelerate the discovery of safer,
+                more potent, and tissue-selective delivery systems and to serve as a foundational infrastructure for
+                the next generation of mRNA medicines.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
     show_metric_row(data)
 
     st.markdown(
