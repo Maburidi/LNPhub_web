@@ -4,7 +4,7 @@ import base64
 from html import escape
 from io import StringIO
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import pandas as pd
 import plotly.express as px
@@ -328,6 +328,14 @@ inject_menu_logo()
 
 
 PAGE_NAMES = ["Home", "Overview", "Datasets", "Lipid Viewer", "Documentation", "About"]
+PAGE_PATHS = {
+    "/": "Home",
+    "/overview": "Overview",
+    "/datasets": "Datasets",
+    "/lipid-viewer": "Lipid Viewer",
+    "/documentation": "Documentation",
+    "/about": "About",
+}
 
 
 def query_param_value(name: str) -> str:
@@ -339,7 +347,14 @@ def query_param_value(name: str) -> str:
 
 def active_page() -> str:
     page = query_param_value("page").replace("_", " ").strip()
-    return page if page in PAGE_NAMES else "Home"
+    if page in PAGE_NAMES:
+        return page
+
+    current_path = urlparse(str(st.context.url)).path.rstrip("/") or "/"
+    if current_path in PAGE_PATHS:
+        return PAGE_PATHS[current_path]
+
+    return "Home"
 
 
 @st.cache_data(show_spinner=False)
@@ -1030,11 +1045,11 @@ def render_studies_table(df: pd.DataFrame) -> None:
 
 
 def lipid_page_url(lnp_id: str) -> str:
-    return f"./?page=Lipid%20Viewer&lnp_id={quote(lnp_id)}"
+    return f"./lipid-viewer?lnp_id={quote(lnp_id)}"
 
 
 def virtual_lipid_page_url(lipid_id: str) -> str:
-    return f"./?page=Lipid%20Viewer&virtual_lipid_id={quote(lipid_id)}"
+    return f"./lipid-viewer?virtual_lipid_id={quote(lipid_id)}"
 
 
 def dataset_table(df: pd.DataFrame) -> None:
@@ -2090,8 +2105,12 @@ def render_about() -> None:
 
 
 data = load_csv()
-page = active_page()
-render_top_nav(page)
+current_url = str(st.context.url)
+if st.session_state.get("_top_nav_url") != current_url:
+    st.session_state["_top_nav_url"] = current_url
+    st.session_state["top_nav_page"] = active_page()
+
+page = render_top_nav(st.session_state.get("top_nav_page", active_page()))
 
 if page == "Home":
     render_home(data)

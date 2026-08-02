@@ -17,12 +17,12 @@ SLACK_URL = "https://join.slack.com/t/lnp-hub/shared_invite/zt-45ilvt7wm-~jd~__6
 GITHUB_URL = "https://github.com/Maburidi/LNPhub_web"
 
 NAV_ITEMS = [
-    ("Home", "./?page=Home"),
-    ("Overview", "./?page=Overview"),
-    ("Datasets", "./?page=Datasets"),
-    ("Lipid Viewer", "./?page=Lipid%20Viewer"),
-    ("Documentation", "./?page=Documentation"),
-    ("About", "./?page=About"),
+    ("Home", "./"),
+    ("Overview", "./overview"),
+    ("Datasets", "./datasets"),
+    ("Lipid Viewer", "./lipid-viewer"),
+    ("Documentation", "./documentation"),
+    ("About", "./about"),
 ]
 
 
@@ -65,6 +65,15 @@ def inject_theme() -> None:
                 --lnp-surface: #ffffff;
                 --lnp-bg: #f7faf9;
                 --lnp-border: #d9e5e2;
+            }
+
+            html,
+            body,
+            #root,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stApp {
+                background-color: var(--lnp-bg) !important;
             }
 
             .stApp {
@@ -181,7 +190,133 @@ def inject_theme() -> None:
                     drop-shadow(0 7px 7px rgba(0, 20, 22, 0.7))
                     drop-shadow(0 0 9px rgba(127, 212, 202, 0.52));
                 height: 34px;
+                transform: translateY(4px);
                 width: 34px;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) {
+                align-items: center;
+                background: linear-gradient(135deg, #063638, #0b5558 56%, #083f43);
+                border: 1px solid rgba(127, 212, 202, 0.34);
+                border-radius: 8px;
+                box-shadow: 0 12px 34px rgba(0, 106, 113, 0.2);
+                gap: 6px;
+                margin: 0;
+                padding: 6px 14px 6px 8px;
+                position: sticky;
+                top: 0;
+                z-index: 50;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="column"] {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .lnp-smooth-brand {
+                align-items: center;
+                display: flex;
+                height: 38px;
+                justify-content: flex-start;
+                line-height: 0;
+                transform: translateY(-8px);
+            }
+
+            .lnp-smooth-brand img {
+                display: block;
+                height: 38px;
+                object-fit: contain;
+                width: 128px;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] {
+                background: transparent !important;
+                border: 0 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] [role="radiogroup"] {
+                align-items: center;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                justify-content: flex-start;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button,
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"] {
+                background: transparent !important;
+                border: 1px solid transparent !important;
+                border-radius: 6px;
+                color: rgba(231, 255, 250, 0.86) !important;
+                font-size: 0.94rem !important;
+                font-weight: 700 !important;
+                min-height: 42px;
+                padding: 10px 14px !important;
+                transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button p,
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"] p {
+                color: rgba(231, 255, 250, 0.86) !important;
+                font-weight: 700 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button:hover,
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"]:hover {
+                background: rgba(127, 212, 202, 0.13) !important;
+                color: #dffff9 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button[aria-pressed="true"],
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button[data-checked="true"],
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pillsActive"] {
+                background: linear-gradient(135deg, #d7f2ee, #83dfd2) !important;
+                color: #063638 !important;
+                box-shadow: 0 7px 18px rgba(131, 223, 210, 0.34) !important;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pillsActive"] p {
+                color: #063638 !important;
+                font-weight: 700 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stRadio"] {
+                background: transparent !important;
+                border: 0 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stRadio"] [role="radiogroup"] {
+                align-items: center;
+                display: flex !important;
+                flex-wrap: wrap;
+                gap: 5px;
+                justify-content: flex-start;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stRadio"] label {
+                background: transparent !important;
+                border: 1px solid transparent !important;
+                border-radius: 6px !important;
+                color: rgba(231, 255, 250, 0.86) !important;
+                font-size: 0.94rem !important;
+                font-weight: 700 !important;
+                justify-content: center;
+                min-height: 42px;
+                padding: 10px 14px !important;
+                text-align: center;
+            }
+
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stRadio"] label:has(input:checked) {
+                background: linear-gradient(135deg, #d7f2ee, #83dfd2) !important;
+                color: #063638 !important;
+                box-shadow: 0 7px 18px rgba(131, 223, 210, 0.34);
             }
 
             .stTabs [data-baseweb="tab-list"],
@@ -1600,7 +1735,7 @@ def inject_theme() -> None:
     )
 
 
-def render_top_nav(active: str) -> None:
+def render_top_nav(active: str) -> str:
     logo = logo_data_uri()
     github_icon = image_data_uri(GITHUB_ICON_PATH)
     logo_html = f'<img src="{logo}" alt="LNP-Hub logo">' if logo else ""
@@ -1609,24 +1744,43 @@ def render_top_nav(active: str) -> None:
         if github_icon
         else ""
     )
-    links = "\n".join(
-        f'<a class="{"active" if label == active else ""}" href="{href}" target="_self" rel="self">{label}</a>'
-        for label, href in NAV_ITEMS
-    )
-    st.markdown(
-        f"""
-        <div class="lnp-topbar">
-            <a class="lnp-brand-mark" href="./?page=Home" target="_self" rel="self" aria-label="LNP-Hub home">
+    labels = [label for label, _href in NAV_ITEMS]
+    if active not in labels:
+        active = labels[0]
+    if st.session_state.get("top_nav_page") not in labels:
+        st.session_state["top_nav_page"] = active
+
+    brand_col, nav_col, github_col = st.columns([0.09, 0.85, 0.06])
+    with brand_col:
+        st.markdown(
+            f"""
+            <div class="lnp-smooth-brand" aria-label="LNP-Hub">
                 {logo_html}
-            </a>
-            <nav class="lnp-nav">
-                {links}
-            </nav>
-            {github_html}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with nav_col:
+        if hasattr(st, "pills"):
+            selected = st.pills(
+                "Navigation",
+                labels,
+                selection_mode="single",
+                key="top_nav_page",
+                label_visibility="collapsed",
+            )
+        else:
+            selected = st.radio(
+                "Navigation",
+                labels,
+                horizontal=True,
+                key="top_nav_page",
+                label_visibility="collapsed",
+            )
+    with github_col:
+        st.markdown(github_html, unsafe_allow_html=True)
+
+    return selected or active
 
 
 def inject_menu_logo() -> None:
@@ -1782,11 +1936,11 @@ def render_footer() -> None:
                     </div>
                 </div>
                 <nav class="lnp-footer-links" aria-label="Footer navigation">
-                    <a href="./?page=Home" target="_self" rel="self">Home</a>
-                    <a href="./?page=Overview" target="_self" rel="self">Overview</a>
-                    <a href="./?page=Datasets" target="_self" rel="self">Datasets</a>
-                    <a href="./?page=Lipid%20Viewer" target="_self" rel="self">Lipid Viewer</a>
-                    <a href="./?page=Documentation" target="_self" rel="self">Documentation</a>
+                    <a href="./" target="_self" rel="self">Home</a>
+                    <a href="./overview" target="_self" rel="self">Overview</a>
+                    <a href="./datasets" target="_self" rel="self">Datasets</a>
+                    <a href="./lipid-viewer" target="_self" rel="self">Lipid Viewer</a>
+                    <a href="./documentation" target="_self" rel="self">Documentation</a>
                     {social_links}
                 </nav>
             </div>
