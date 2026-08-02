@@ -16,10 +16,12 @@ from lnphub_ui import configure_page, inject_menu_logo, render_footer, render_ho
 try:
     from rdkit import Chem
     from rdkit.Chem import AllChem, Draw
-except ImportError:  # pragma: no cover - exercised only when RDKit is absent.
+    RDKIT_IMPORT_ERROR = ""
+except ImportError as error:  # pragma: no cover - exercised only when RDKit is absent.
     Chem = None
     Draw = None
     AllChem = None
+    RDKIT_IMPORT_ERROR = str(error)
 
 try:
     import py3Dmol
@@ -546,6 +548,13 @@ def structure_svg(smiles: str, width: int = 360, height: int = 240) -> str | Non
         return None
 
     return Draw.MolsToGridImage([mol], molsPerRow=1, subImgSize=(width, height), useSVG=True)
+
+
+def show_rdkit_warning() -> None:
+    message = "RDKit is not available in this Python environment, so structures cannot be rendered here."
+    if RDKIT_IMPORT_ERROR:
+        message = f"{message} Import error: {RDKIT_IMPORT_ERROR}"
+    st.warning(message)
 
 
 def render_2d_structure(smiles: str) -> None:
@@ -1723,7 +1732,7 @@ def render_structure_browser(df: pd.DataFrame) -> None:
     smiles = str(row["il_smiles"])
 
     if Chem is None:
-        st.warning("RDKit is not installed in this Python environment, so structures cannot be rendered here.")
+        show_rdkit_warning()
     else:
         svg = structure_svg(smiles)
         if svg is None:
@@ -1875,7 +1884,7 @@ def render_experimental_lipid_viewer(data: pd.DataFrame) -> None:
     with left:
         st.markdown("#### Structure")
         if Chem is None:
-            st.warning("RDKit is not installed in this Python environment, so structures cannot be rendered here.")
+            show_rdkit_warning()
         elif not smiles:
             st.info("No SMILES string is available for this lipid.")
         else:
@@ -1972,7 +1981,7 @@ def render_virtual_lipid_viewer(virtual_data: pd.DataFrame, requested_lipid_id: 
     with left:
         st.markdown("#### Structure")
         if Chem is None:
-            st.warning("RDKit is not installed in this Python environment, so structures cannot be rendered here.")
+            show_rdkit_warning()
         elif not smiles:
             st.info("No SMILES string is available for this virtual lipid.")
         else:
