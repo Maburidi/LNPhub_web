@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import base64
+from html import escape
 from io import StringIO
 from pathlib import Path
 from urllib.parse import quote
@@ -8,7 +10,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from lnphub_ui import configure_page, inject_menu_logo, render_home_banner
+from lnphub_ui import configure_page, inject_menu_logo, render_footer, render_home_banner, render_layers_section
 
 try:
     from rdkit import Chem
@@ -20,10 +22,28 @@ except ImportError:  # pragma: no cover - exercised only when RDKit is absent.
 
 DATA_PATH = Path("data/LNPhub_public_two_studies.csv")
 
+STUDY_TITLE_FALLBACKS = {
+    "LNPhub_BL_2023": "Combinatorial design of nanoparticles for pulmonary mRNA delivery and genome editing",
+    "LNPhub_YX_2025": (
+        "Antimicrobial peptide delivery to lung as peptibody mRNA in anti-inflammatory lipids "
+        "treats multidrug-resistant bacterial pneumonia"
+    ),
+}
+
+TITLE_COLUMNS = [
+    "paper_title",
+    "publication_title",
+    "article_title",
+    "manuscript_title",
+    "study_title",
+    "title",
+]
+
+LINK_COLUMNS = ["publication_link", "paper_link", "article_link", "url", "doi"]
+
 FILTER_COLUMNS = [
     "study_id",
     "cargo_type",
-    "delivery_value_method",
     "route_of_administration",
     "model",
     "model_type",
@@ -34,6 +54,42 @@ FILTER_COLUMNS = [
     "helper_lipid_name",
     "peg_lipid_name",
 ]
+
+FILTER_GROUPS = [
+    (
+        "Level 1 | Provenance & IDs",
+        ["study_id"],
+    ),
+    (
+        "Level 2 | Molecule & Formulation Definition",
+        [
+            "cargo_type",
+            "il_class",
+            "il_subclass",
+            "il_architecture_type",
+            "helper_lipid_name",
+            "peg_lipid_name",
+        ],
+    ),
+    (
+        "Level 3 | Process & Experimental Context",
+        ["route_of_administration", "model", "model_type", "model_target"],
+    ),
+]
+
+FILTER_LABELS = {
+    "study_id": "Study ID",
+    "cargo_type": "Cargo Type",
+    "route_of_administration": "Route of Administration",
+    "model": "Model",
+    "model_type": "Model Type",
+    "model_target": "Model Target",
+    "il_class": "Ionizable Lipid Class",
+    "il_subclass": "Ionizable Lipid Subclass",
+    "il_architecture_type": "Ionizable Lipid Architecture Type",
+    "helper_lipid_name": "Helper Lipid Name",
+    "peg_lipid_name": "PEG Lipid Name",
+}
 
 SEARCH_COLUMNS = [
     "record_id",
@@ -212,24 +268,46 @@ def details_table(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def filter_label(column: str) -> str:
+    return FILTER_LABELS.get(column, column.replace("_", " ").title())
+
+
 def apply_filters(df: pd.DataFrame) -> pd.DataFrame:
     filtered = df.copy()
-    filter_cols = st.columns(3)
-    visible_filters = available_columns(df, FILTER_COLUMNS)
+    visible_filters = set(available_columns(df, FILTER_COLUMNS))
 
-    for index, column in enumerate(visible_filters):
-        options = filtered_options(df[column])
-        if not options:
+    for group_name, group_columns in FILTER_GROUPS:
+        visible_group_columns = [column for column in group_columns if column in visible_filters]
+        if not visible_group_columns:
             continue
 
-        selected = filter_cols[index % 3].multiselect(
-            column.replace("_", " "),
-            options=options,
-            default=[],
-            key=f"filter_{column}",
+        st.markdown(
+            f"""
+            <div class="lnp-filter-group-divider"></div>
+            <section class="lnp-filter-layer">
+                <p class="lnp-filter-layer-kicker">{escape(group_name.split("|", 1)[-1].strip())}</p>
+            </section>
+            """,
+            unsafe_allow_html=True,
         )
-        if selected:
-            filtered = filtered[filtered[column].astype(str).isin(selected)]
+
+        filter_cols = st.columns(min(3, len(visible_group_columns)))
+        for index, column in enumerate(visible_group_columns):
+            options = filtered_options(df[column])
+            if not options:
+                continue
+
+            label = filter_label(column)
+            with filter_cols[index % len(filter_cols)]:
+                selected = st.multiselect(
+                    label,
+                    options=options,
+                    default=[],
+                    key=f"filter_{column}",
+                    placeholder=f"Any {label}",
+                )
+            if selected:
+                filtered = filtered[filtered[column].astype(str).isin(selected)]
 
     return filtered
 
@@ -263,11 +341,115 @@ def structure_svg(smiles: str, width: int = 360, height: int = 240) -> str | Non
 
 
 def show_metric_row(df: pd.DataFrame) -> None:
-    cols = st.columns(4)
-    cols[0].metric("Records", f"{len(df):,}")
-    cols[1].metric("Studies", f"{df['study_id'].nunique():,}" if "study_id" in df else "0")
-    cols[2].metric("Ionizable lipids", f"{df['il_id'].nunique():,}" if "il_id" in df else "0")
-    cols[3].metric("LNPs", f"{df['lnp_id'].nunique():,}" if "lnp_id" in df else "0")
+    metrics = [
+        ("Experimental Records", f"{len(df):,}"),
+        ("Studies", f"{df['study_id'].nunique():,}" if "study_id" in df else "0"),
+        ("Ionizable Lipids", f"{df['il_id'].nunique():,}" if "il_id" in df else "0"),
+        ("LNP Formulations", f"{df['lnp_id'].nunique():,}" if "lnp_id" in df else "0"),
+    ]
+    stat_tiles = "\n".join(
+        f"""
+        <div class="lnp-stat-tile">
+            <div class="lnp-stat-label">{label}</div>
+            <div class="lnp-stat-value">{value}</div>
+        </div>
+        """
+        for label, value in metrics
+    )
+    st.markdown(
+        f"""
+        <section class="lnp-stat-grid">
+            {stat_tiles}
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def first_existing_column(df: pd.DataFrame, candidates: list[str]) -> str | None:
+    for column in candidates:
+        if column in df.columns:
+            return column
+    return None
+
+
+def normalize_publication_link(value: object) -> str:
+    link = "" if pd.isna(value) else str(value).strip()
+    if not link:
+        return ""
+    if link.startswith(("http://", "https://")):
+        return link
+    if link.startswith("doi:"):
+        return f"https://doi.org/{link[4:].strip()}"
+    if "/" in link and link[:2].isdigit():
+        return f"https://doi.org/{link}"
+    return link
+
+
+def render_studies_table(df: pd.DataFrame) -> None:
+    if "study_id" not in df.columns or df.empty:
+        return
+
+    title_column = first_existing_column(df, TITLE_COLUMNS)
+    link_column = first_existing_column(df, LINK_COLUMNS)
+    rows = []
+
+    for study_id, study_df in df.groupby("study_id", dropna=True, sort=True):
+        study_id_text = str(study_id)
+        title = STUDY_TITLE_FALLBACKS.get(study_id_text, study_id_text)
+        if title_column:
+            titles = study_df[title_column].dropna().astype(str).str.strip()
+            titles = titles[titles != ""]
+            if not titles.empty:
+                title = titles.iloc[0]
+
+        link = ""
+        if link_column:
+            links = study_df[link_column].dropna().map(normalize_publication_link)
+            links = links[links != ""]
+            if not links.empty:
+                link = links.iloc[0]
+
+        records = len(study_df)
+        ionizable_lipids = study_df["il_id"].nunique() if "il_id" in study_df else 0
+        formulations = study_df["lnp_id"].nunique() if "lnp_id" in study_df else 0
+        paper_html = (
+            f'<a class="lnp-paper-link" href="{escape(link, quote=True)}" target="_blank" rel="noopener noreferrer">'
+            f'{escape(title)} <span aria-hidden="true">&nearr;</span></a>'
+            if link
+            else escape(title)
+        )
+        rows.append(
+            "<tr>"
+            f'<td><span class="lnp-study-id">{escape(study_id_text)}</span></td>'
+            f"<td>{paper_html}</td>"
+            f'<td><span class="lnp-study-count">{records:,}</span></td>'
+            f'<td><span class="lnp-study-count">{ionizable_lipids:,}</span></td>'
+            f'<td><span class="lnp-study-count">{formulations:,}</span></td>'
+            "</tr>"
+        )
+
+    table_html = (
+        '<section class="lnp-studies-section">'
+        '<h2 class="lnp-section-heading">LNP Libraries</h2>'
+        '<p class="lnp-section-subtitle">'
+        "Source publications currently represented in LNP-Hub, summarized directly from the loaded dataset."
+        "</p>"
+        '<div class="lnp-study-table-wrap">'
+        '<table class="lnp-study-table">'
+        "<thead><tr>"
+        "<th>Study ID</th>"
+        "<th>Paper</th>"
+        "<th>Records</th>"
+        "<th>Ionizable Lipids</th>"
+        "<th>LNP Formulations</th>"
+        "</tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table>"
+        "</div>"
+        "</section>"
+    )
+    st.markdown(table_html, unsafe_allow_html=True)
 
 
 def lipid_page_url(il_id: str) -> str:
@@ -306,17 +488,10 @@ def render_home(data: pd.DataFrame) -> None:
 
     st.markdown(
         """
-        <p class="lnp-ai-intro">
-            Artificial intelligence is emerging as a powerful foundation for the rational design of lipid nanoparticles
-            and the next generation of mRNA therapeutics. By integrating lipid structure, formulation composition,
-            manufacturing conditions, and biological performance, AI can uncover complex relationships that are
-            difficult to resolve through conventional experimentation alone. These models can guide the selection
-            and optimization of ionizable lipids, predict critical properties such as potency, stability,
-            biodistribution, tissue selectivity, and tolerability, and help prioritize the most promising formulations
-            before costly experimental validation. By reducing empirical trial and error while complementing
-            mechanistic insight, AI has the potential to accelerate LNP discovery, improve the precision and safety
-            of mRNA delivery, and enable the development of more effective and broadly accessible RNA medicines.
-        </p>
+        <h2 class="lnp-portal-tagline">
+            LNP-Hub: Enabling Structure&ndash;Function Modeling, AI-Driven LNP Discovery,
+            and Next-Generation mRNA Delivery
+        </h2>
         """,
         unsafe_allow_html=True,
     )
@@ -338,41 +513,48 @@ def render_home(data: pd.DataFrame) -> None:
                 the next generation of mRNA medicines.
             </p>
         </section>
+        <div class="lnp-section-divider"></div>
         """,
         unsafe_allow_html=True,
     )
 
     show_metric_row(data)
+    render_layers_section()
+    render_studies_table(data)
 
+
+def render_curated_experimental_libraries(data: pd.DataFrame) -> None:
+    working_data = data
+    full_csv = working_data.to_csv(index=False).encode("utf-8")
+    full_csv_href = base64.b64encode(full_csv).decode("ascii")
     st.markdown(
-        """
-        <section class="lnp-band">
-            <div class="lnp-card-grid">
-                <div class="lnp-card">
-                    <h3>Filterable Records</h3>
-                    <p>Explore studies, cargo types, routes, models, helper lipids, PEG lipids, and delivery readouts.</p>
-                </div>
-                <div class="lnp-card">
-                    <h3>Molecular Structures</h3>
-                    <p>Open individual ionizable lipids and render their structures directly from SMILES with RDKit.</p>
-                </div>
-                <div class="lnp-card">
-                    <h3>Assay Context</h3>
-                    <p>Connect delivery values with formulation ratios, particle properties, pKa, zeta, and model metadata.</p>
-                </div>
+        f"""
+        <section class="lnp-download-panel">
+            <div>
+                <p class="lnp-download-kicker">Curated Experimental Libraries</p>
+                <h3>Download All Curated Libraries</h3>
+                <p>
+                    Export the complete curated LNP-Hub experimental dataset as a machine-readable CSV file.
+                </p>
+                <a
+                    class="lnp-download-action"
+                    href="data:text/csv;base64,{full_csv_href}"
+                    download="lnphub_curated_experimental_libraries.csv"
+                >
+                    Download all curated libraries as CSV
+                </a>
             </div>
         </section>
         """,
         unsafe_allow_html=True,
     )
-
-
-def render_start(data: pd.DataFrame) -> None:
-    st.title("Start")
-    st.caption("Filter, search, visualize, and export the curated LNP dataset.")
-
-    uploaded_file = st.file_uploader("Upload a curated LNPhub CSV", type=["csv"], key="start_upload")
-    working_data = load_csv(uploaded_file.getvalue()) if uploaded_file is not None else data
+    st.markdown(
+        """
+        <div class="lnp-section-divider"></div>
+        <h3 class="lnp-filter-heading">Filter by:</h3>
+        """,
+        unsafe_allow_html=True,
+    )
 
     filtered_data = apply_filters(working_data)
     query = st.text_input(
@@ -399,6 +581,38 @@ def render_start(data: pd.DataFrame) -> None:
 
     with plots_tab:
         render_plot_explorer(filtered_data)
+
+
+def render_virtual_screening_libraries() -> None:
+    st.markdown(
+        """
+        <section class="lnp-dataset-placeholder">
+            <h3>Virtual Screening Libraries</h3>
+            <p>
+                Virtual lipid libraries for computational screening and model-guided prioritization
+                will be organized here as LNP-Hub expands.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_datasets(data: pd.DataFrame) -> None:
+    st.markdown('<div class="lnp-dataset-drawer">', unsafe_allow_html=True)
+    selected_dataset = st.radio(
+        "Dataset library",
+        ["Curated Experimental Libraries", "Virtual Screening Libraries"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="dataset_library_menu",
+    )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    if selected_dataset == "Curated Experimental Libraries":
+        render_curated_experimental_libraries(data)
+    else:
+        render_virtual_screening_libraries()
 
 
 def render_structure_browser(df: pd.DataFrame) -> None:
@@ -597,9 +811,9 @@ def render_documentation() -> None:
     st.caption("Working notes for users who want to explore, reproduce, or extend LNP-Hub.")
     st.markdown(
         """
-        ### Quick Start
+        ### Quick Guide
 
-        Use **Start** to filter the dataset, search by lipid identifiers or SMILES,
+        Use **Datasets** to filter the dataset, search by lipid identifiers or SMILES,
         inspect molecule structures, plot numeric readouts, and download filtered records.
 
         ### Local Development
@@ -636,18 +850,15 @@ def render_about() -> None:
 
 
 data = load_csv()
-home_tab, start_tab, data_tab, lipid_tab, docs_tab, about_tab = st.tabs(
-    ["Home", "Start", "Data", "Lipid Viewer", "Documentation", "About"]
+home_tab, datasets_tab, lipid_tab, docs_tab, about_tab = st.tabs(
+    ["Home", "Datasets", "Lipid Viewer", "Documentation", "About"]
 )
 
 with home_tab:
     render_home(data)
 
-with start_tab:
-    render_start(data)
-
-with data_tab:
-    render_data_catalog(data)
+with datasets_tab:
+    render_datasets(data)
 
 with lipid_tab:
     render_lipid_viewer(data)
@@ -657,3 +868,5 @@ with docs_tab:
 
 with about_tab:
     render_about()
+
+render_footer()
