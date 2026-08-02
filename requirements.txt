@@ -2,3 +2,4 @@ streamlit>=1.37
 pandas>=2.2
 plotly>=5.22
 rdkit>=2024.9
+py3Dmol>=2.4
