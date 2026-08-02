@@ -17,12 +17,12 @@ SLACK_URL = "https://join.slack.com/t/lnp-hub/shared_invite/zt-45ilvt7wm-~jd~__6
 GITHUB_URL = "https://github.com/Maburidi/LNPhub_web"
 
 NAV_ITEMS = [
-    ("Home", "./"),
-    ("Overview", "./overview"),
-    ("Datasets", "./datasets"),
-    ("Lipid Viewer", "./lipid-viewer"),
-    ("Documentation", "./documentation"),
-    ("About", "./about"),
+    ("Home", "./?page=Home"),
+    ("Overview", "./?page=Overview"),
+    ("Datasets", "./?page=Datasets"),
+    ("Lipid Viewer", "./?page=Lipid_Viewer"),
+    ("Documentation", "./?page=Documentation"),
+    ("About", "./?page=About"),
 ]
 
 
@@ -1936,11 +1936,11 @@ def render_footer() -> None:
                     </div>
                 </div>
                 <nav class="lnp-footer-links" aria-label="Footer navigation">
-                    <a href="./" target="_self" rel="self">Home</a>
-                    <a href="./overview" target="_self" rel="self">Overview</a>
-                    <a href="./datasets" target="_self" rel="self">Datasets</a>
-                    <a href="./lipid-viewer" target="_self" rel="self">Lipid Viewer</a>
-                    <a href="./documentation" target="_self" rel="self">Documentation</a>
+                    <a href="./?page=Home" target="_self" rel="self">Home</a>
+                    <a href="./?page=Overview" target="_self" rel="self">Overview</a>
+                    <a href="./?page=Datasets" target="_self" rel="self">Datasets</a>
+                    <a href="./?page=Lipid_Viewer" target="_self" rel="self">Lipid Viewer</a>
+                    <a href="./?page=Documentation" target="_self" rel="self">Documentation</a>
                     {social_links}
                 </nav>
             </div>
