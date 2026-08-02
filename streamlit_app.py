@@ -336,6 +336,7 @@ PAGE_PATHS = {
     "/documentation": "Documentation",
     "/about": "About",
 }
+PAGE_QUERY_VALUES = {page: page.replace(" ", "_") for page in PAGE_NAMES}
 
 
 def query_param_value(name: str) -> str:
@@ -350,11 +351,33 @@ def active_page() -> str:
     if page in PAGE_NAMES:
         return page
 
-    current_path = urlparse(str(st.context.url)).path.rstrip("/") or "/"
-    if current_path in PAGE_PATHS:
-        return PAGE_PATHS[current_path]
+    streamlit_context = getattr(st, "context", None)
+    if streamlit_context is not None:
+        current_path = urlparse(str(streamlit_context.url)).path.rstrip("/") or "/"
+        if current_path in PAGE_PATHS:
+            return PAGE_PATHS[current_path]
 
     return "Home"
+
+
+def sync_page_url(page: str) -> None:
+    st.query_params.clear()
+    st.query_params["page"] = PAGE_QUERY_VALUES.get(page, "Home")
+
+
+def normalize_path_url() -> None:
+    components.html(
+        """
+        <script>
+            const parentUrl = new URL(window.parent.location.href);
+            if (parentUrl.pathname !== "/" && parentUrl.searchParams.has("page")) {
+                parentUrl.pathname = "/";
+                window.parent.history.replaceState({}, "", parentUrl.toString());
+            }
+        </script>
+        """,
+        height=0,
+    )
 
 
 @st.cache_data(show_spinner=False)
@@ -1045,11 +1068,11 @@ def render_studies_table(df: pd.DataFrame) -> None:
 
 
 def lipid_page_url(lnp_id: str) -> str:
-    return f"./lipid-viewer?lnp_id={quote(lnp_id)}"
+    return f"./?page=Lipid_Viewer&lnp_id={quote(lnp_id)}"
 
 
 def virtual_lipid_page_url(lipid_id: str) -> str:
-    return f"./lipid-viewer?virtual_lipid_id={quote(lipid_id)}"
+    return f"./?page=Lipid_Viewer&virtual_lipid_id={quote(lipid_id)}"
 
 
 def dataset_table(df: pd.DataFrame) -> None:
@@ -2094,23 +2117,67 @@ def render_documentation() -> None:
 
 def render_about() -> None:
     st.title("About LNP-Hub")
-    st.caption("A curated data commons for lipid nanoparticle formulation and delivery science.")
+    st.caption("A curated data commons for lipid nanoparticle formulation, delivery, and AI-driven therapeutic discovery.")
     st.markdown(
         """
-        LNP-Hub is being built as a public web portal for curated lipid nanoparticle
-        records across studies, chemistries, formulations, biological models, and
-        delivery readouts.
+        LNP-Hub is a structured web portal for curated lipid nanoparticle data,
+        designed to connect lipid chemistry, formulation composition, experimental
+        context, physicochemical characterization, biological readouts, and safety
+        information in one machine-readable resource.
+
+        The goal of LNP-Hub is to make experimental LNP evidence easier to search,
+        compare, reuse, and model. By standardizing records across studies, the
+        portal supports structure-function analysis, benchmarking of predictive
+        models, and AI-guided discovery of safer, more potent, and more selective
+        nucleic acid delivery systems.
         """
+    )
+    st.markdown(
+        """
+        <div class="lnp-card-grid">
+            <div class="lnp-card">
+                <h3>What It Organizes</h3>
+                <p>
+                    Curated study provenance, lipid identifiers, SMILES strings,
+                    formulation ratios, administration routes, biological models,
+                    delivery values, particle properties, and molecular descriptors.
+                </p>
+            </div>
+            <div class="lnp-card">
+                <h3>Why It Matters</h3>
+                <p>
+                    LNP data are often fragmented across publications and formats.
+                    LNP-Hub brings these records into a consistent structure that can
+                    support reproducible analysis and computational model development.
+                </p>
+            </div>
+            <div class="lnp-card">
+                <h3>Who It Supports</h3>
+                <p>
+                    Researchers working in RNA delivery, formulation science,
+                    lipid chemistry, bioengineering, machine learning, and
+                    translational mRNA therapeutic development.
+                </p>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
 
 data = load_csv()
-current_url = str(st.context.url)
-if st.session_state.get("_top_nav_url") != current_url:
-    st.session_state["_top_nav_url"] = current_url
-    st.session_state["top_nav_page"] = active_page()
+page_from_url = active_page()
+if st.session_state.get("_top_nav_page_from_url") != page_from_url:
+    st.session_state["_top_nav_page_from_url"] = page_from_url
+    st.session_state["top_nav_page"] = page_from_url
 
-page = render_top_nav(st.session_state.get("top_nav_page", active_page()))
+page = render_top_nav(page_from_url)
+if page != page_from_url:
+    st.session_state["_top_nav_page_from_url"] = page
+    sync_page_url(page)
+    st.rerun()
+
+normalize_path_url()
 
 if page == "Home":
     render_home(data)
