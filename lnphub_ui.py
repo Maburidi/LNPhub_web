@@ -105,7 +105,7 @@ def inject_theme() -> None:
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 18px;
+                gap: 6px;
                 background: linear-gradient(135deg, #063638, #0b5558 56%, #083f43);
                 border: 1px solid rgba(127, 212, 202, 0.34);
                 border-radius: 8px;
@@ -126,6 +126,7 @@ def inject_theme() -> None:
                 height: 38px;
                 justify-content: center;
                 text-decoration: none;
+                transform: translateY(-8px);
             }
 
             .lnp-brand-mark img {
@@ -1744,43 +1745,26 @@ def render_top_nav(active: str) -> str:
         if github_icon
         else ""
     )
-    labels = [label for label, _href in NAV_ITEMS]
-    if active not in labels:
-        active = labels[0]
-    if st.session_state.get("top_nav_page") not in labels:
-        st.session_state["top_nav_page"] = active
-
-    brand_col, nav_col, github_col = st.columns([0.09, 0.85, 0.06])
-    with brand_col:
-        st.markdown(
-            f"""
-            <div class="lnp-smooth-brand" aria-label="LNP-Hub">
+    links = "\n".join(
+        f'<a class="{"active" if label == active else ""}" href="{href}" target="_self" rel="self">{label}</a>'
+        for label, href in NAV_ITEMS
+    )
+    st.markdown(
+        f"""
+        <div class="lnp-topbar">
+            <a class="lnp-brand-mark" href="./?page=Home" target="_self" rel="self" aria-label="LNP-Hub home">
                 {logo_html}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with nav_col:
-        if hasattr(st, "pills"):
-            selected = st.pills(
-                "Navigation",
-                labels,
-                selection_mode="single",
-                key="top_nav_page",
-                label_visibility="collapsed",
-            )
-        else:
-            selected = st.radio(
-                "Navigation",
-                labels,
-                horizontal=True,
-                key="top_nav_page",
-                label_visibility="collapsed",
-            )
-    with github_col:
-        st.markdown(github_html, unsafe_allow_html=True)
+            </a>
+            <nav class="lnp-nav">
+                {links}
+            </nav>
+            {github_html}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    return selected or active
+    return active
 
 
 def inject_menu_logo() -> None:

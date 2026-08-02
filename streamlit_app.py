@@ -336,7 +336,6 @@ PAGE_PATHS = {
     "/documentation": "Documentation",
     "/about": "About",
 }
-PAGE_QUERY_VALUES = {page: page.replace(" ", "_") for page in PAGE_NAMES}
 
 
 def query_param_value(name: str) -> str:
@@ -358,11 +357,6 @@ def active_page() -> str:
             return PAGE_PATHS[current_path]
 
     return "Home"
-
-
-def sync_page_url(page: str) -> None:
-    st.query_params.clear()
-    st.query_params["page"] = PAGE_QUERY_VALUES.get(page, "Home")
 
 
 def normalize_path_url() -> None:
@@ -2128,17 +2122,8 @@ def render_about() -> None:
 
 
 data = load_csv()
-page_from_url = active_page()
-if st.session_state.get("_top_nav_page_from_url") != page_from_url:
-    st.session_state["_top_nav_page_from_url"] = page_from_url
-    st.session_state["top_nav_page"] = page_from_url
-
-page = render_top_nav(page_from_url)
-if page != page_from_url:
-    st.session_state["_top_nav_page_from_url"] = page
-    sync_page_url(page)
-    st.rerun()
-
+page = active_page()
+render_top_nav(page)
 normalize_path_url()
 
 if page == "Home":
