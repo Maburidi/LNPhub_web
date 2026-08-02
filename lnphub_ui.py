@@ -216,17 +216,21 @@ def inject_theme() -> None:
 
             .lnp-smooth-brand {
                 align-items: center;
+                cursor: default;
                 display: flex;
                 height: 38px;
                 justify-content: flex-start;
                 line-height: 0;
+                pointer-events: none;
                 transform: translateY(-8px);
+                user-select: none;
             }
 
             .lnp-smooth-brand img {
                 display: block;
                 height: 38px;
                 object-fit: contain;
+                pointer-events: none;
                 width: 128px;
             }
 
@@ -273,10 +277,10 @@ def inject_theme() -> None:
             .st-key-top_nav_page button[data-testid="stBaseButton-pills"],
             div[class*="st-key-top_nav_page"] button[kind="pills"],
             div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"] {
-                background: transparent !important;
-                background-color: transparent !important;
+                background: rgba(6, 54, 56, 0.22) !important;
+                background-color: rgba(6, 54, 56, 0.22) !important;
                 background-image: none !important;
-                border: 1px solid transparent !important;
+                border: 1px solid rgba(127, 212, 202, 0.24) !important;
                 border-radius: 6px;
                 box-shadow: none !important;
                 color: rgba(231, 255, 250, 0.86) !important;
@@ -304,9 +308,10 @@ def inject_theme() -> None:
             .st-key-top_nav_page button[data-testid="stBaseButton-pills"]:hover,
             div[class*="st-key-top_nav_page"] button[kind="pills"]:hover,
             div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"]:hover {
-                background: rgba(127, 212, 202, 0.13) !important;
-                background-color: rgba(127, 212, 202, 0.13) !important;
+                background: rgba(127, 212, 202, 0.18) !important;
+                background-color: rgba(127, 212, 202, 0.18) !important;
                 background-image: none !important;
+                border-color: rgba(127, 212, 202, 0.42) !important;
                 color: #dffff9 !important;
             }
 
@@ -1840,6 +1845,50 @@ def render_top_nav(active: str) -> str:
             )
     with github_col:
         st.markdown(github_html, unsafe_allow_html=True)
+
+    st.markdown(
+        """
+        <style>
+            .st-key-top_nav_page button[data-testid="stBaseButton-pills"],
+            .st-key-top_nav_page button[kind="pills"],
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"],
+            div[class*="st-key-top_nav_page"] button[kind="pills"] {
+                background: rgba(6, 54, 56, 0.22) !important;
+                background-color: rgba(6, 54, 56, 0.22) !important;
+                background-image: none !important;
+                border-color: rgba(127, 212, 202, 0.24) !important;
+                box-shadow: none !important;
+                color: rgba(231, 255, 250, 0.88) !important;
+            }
+
+            .st-key-top_nav_page button[data-testid="stBaseButton-pills"] p,
+            .st-key-top_nav_page button[kind="pills"] p,
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"] p,
+            div[class*="st-key-top_nav_page"] button[kind="pills"] p {
+                color: rgba(231, 255, 250, 0.88) !important;
+            }
+
+            .st-key-top_nav_page button[data-testid="stBaseButton-pillsActive"],
+            .st-key-top_nav_page button[kind="pillsActive"],
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pillsActive"],
+            div[class*="st-key-top_nav_page"] button[kind="pillsActive"] {
+                background: linear-gradient(135deg, #d7f2ee, #83dfd2) !important;
+                background-color: #d7f2ee !important;
+                border-color: rgba(127, 212, 202, 0.48) !important;
+                box-shadow: 0 7px 18px rgba(131, 223, 210, 0.34) !important;
+                color: #063638 !important;
+            }
+
+            .st-key-top_nav_page button[data-testid="stBaseButton-pillsActive"] p,
+            .st-key-top_nav_page button[kind="pillsActive"] p,
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pillsActive"] p,
+            div[class*="st-key-top_nav_page"] button[kind="pillsActive"] p {
+                color: #063638 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
     return selected or active
 
