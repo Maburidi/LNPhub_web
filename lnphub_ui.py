@@ -220,6 +220,7 @@ def inject_theme() -> None:
                 height: 38px;
                 justify-content: flex-start;
                 line-height: 0;
+                text-decoration: none;
                 transform: translateY(-8px);
             }
 
@@ -1754,9 +1755,9 @@ def render_top_nav(active: str) -> str:
     with brand_col:
         st.markdown(
             f"""
-            <div class="lnp-smooth-brand" aria-label="LNP-Hub">
+            <a class="lnp-smooth-brand" href="./?page=Home" target="_self" rel="self" aria-label="LNP-Hub home">
                 {logo_html}
-            </div>
+            </a>
             """,
             unsafe_allow_html=True,
         )
