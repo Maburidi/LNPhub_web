@@ -8,6 +8,7 @@ import streamlit as st
 
 APP_NAME = "LNP-Hub"
 LOGO_PATH = Path("assets/logo2_2.png")
+WEBPAGE_ICON_PATH = Path("assets/webpage_icon.png")
 BANNER_PATH = Path("assets/banner_head.png")
 LAYERS_PATH = Path("assets/layers.png")
 SLACK_ICON_PATH = Path("assets/icon_slack.png")
@@ -16,18 +17,19 @@ SLACK_URL = "https://join.slack.com/t/lnp-hub/shared_invite/zt-45ilvt7wm-~jd~__6
 GITHUB_URL = "https://github.com/Maburidi/LNPhub_web"
 
 NAV_ITEMS = [
-    ("Home", "./"),
-    ("Datasets", "./Datasets"),
-    ("Lipid Viewer", "./Lipid_Viewer"),
-    ("Documentation", "./Documentation"),
-    ("About", "./About"),
+    ("Home", "./?page=Home"),
+    ("Overview", "./?page=Overview"),
+    ("Datasets", "./?page=Datasets"),
+    ("Lipid Viewer", "./?page=Lipid%20Viewer"),
+    ("Documentation", "./?page=Documentation"),
+    ("About", "./?page=About"),
 ]
 
 
 def configure_page(page_title: str) -> None:
     st.set_page_config(
         page_title=f"{page_title} | {APP_NAME}",
-        page_icon=":test_tube:",
+        page_icon=str(WEBPAGE_ICON_PATH) if WEBPAGE_ICON_PATH.exists() else ":test_tube:",
         layout="wide",
         initial_sidebar_state="collapsed",
     )
@@ -94,73 +96,92 @@ def inject_theme() -> None:
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                gap: 24px;
-                padding: 10px 0 12px;
+                gap: 18px;
+                background: linear-gradient(135deg, #063638, #0b5558 56%, #083f43);
+                border: 1px solid rgba(127, 212, 202, 0.34);
+                border-radius: 8px;
+                box-shadow: 0 12px 34px rgba(0, 106, 113, 0.2);
+                margin: 0;
+                padding: 6px 56px 6px 8px;
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                backdrop-filter: blur(14px);
                 margin-bottom: 0;
             }
 
-            .lnp-brand {
+            .lnp-brand-mark {
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                min-width: 218px;
-                color: var(--lnp-ink);
+                flex: 0 0 auto;
+                height: 38px;
+                justify-content: center;
                 text-decoration: none;
             }
 
-            .lnp-brand img {
-                width: 58px;
-                height: 58px;
-                object-fit: cover;
-                border-radius: 8px;
-                box-shadow: 0 6px 18px rgba(0, 106, 113, 0.16);
-            }
-
-            .lnp-brand-text {
-                display: flex;
-                flex-direction: column;
-                line-height: 1.05;
-            }
-
-            .lnp-brand-name {
-                font-size: 1.06rem;
-                font-weight: 760;
-                letter-spacing: 0;
-            }
-
-            .lnp-brand-subtitle {
-                margin-top: 5px;
-                color: var(--lnp-muted);
-                font-size: 0.78rem;
+            .lnp-brand-mark img {
+                display: block;
+                height: 38px;
+                object-fit: contain;
+                width: 128px;
             }
 
             .lnp-nav {
                 display: flex;
                 flex-wrap: wrap;
-                justify-content: flex-end;
+                justify-content: flex-start;
                 gap: 5px;
+                margin-right: auto;
             }
 
             .lnp-nav a {
-                color: var(--lnp-blue);
+                color: rgba(231, 255, 250, 0.86);
                 text-decoration: none;
-                font-size: 0.92rem;
-                font-weight: 650;
-                padding: 9px 12px;
+                font-size: 0.94rem;
+                font-weight: 700;
+                min-height: 42px;
+                padding: 10px 14px;
                 border-radius: 6px;
                 border: 1px solid transparent;
+                box-sizing: border-box;
+                transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
             }
 
             .lnp-nav a:hover {
-                background: rgba(0, 106, 113, 0.09);
-                border-color: rgba(0, 106, 113, 0.18);
-                color: var(--lnp-teal);
+                background: rgba(127, 212, 202, 0.13);
+                color: #dffff9;
             }
 
             .lnp-nav a.active {
-                color: #ffffff;
-                background: linear-gradient(135deg, var(--lnp-teal), #218a83);
-                border-color: var(--lnp-teal);
+                background: linear-gradient(135deg, #d7f2ee, #83dfd2);
+                color: #063638;
+                box-shadow: 0 7px 18px rgba(131, 223, 210, 0.34);
+            }
+
+            .lnp-topbar-github {
+                align-items: center;
+                display: inline-flex;
+                justify-content: center;
+                line-height: 0;
+                margin-left: 6px;
+                text-decoration: none;
+                transition: filter 150ms ease, transform 150ms ease;
+            }
+
+            .lnp-topbar-github:hover {
+                filter:
+                    drop-shadow(0 8px 9px rgba(0, 20, 22, 0.6))
+                    drop-shadow(0 0 10px rgba(127, 212, 202, 0.48));
+                transform: translateY(-1px);
+            }
+
+            .lnp-topbar-github img {
+                display: block;
+                filter:
+                    drop-shadow(0 7px 7px rgba(0, 20, 22, 0.7))
+                    drop-shadow(0 0 9px rgba(127, 212, 202, 0.52));
+                height: 34px;
+                width: 34px;
             }
 
             .stTabs [data-baseweb="tab-list"],
@@ -1004,6 +1025,18 @@ def inject_theme() -> None:
                 text-decoration: none !important;
             }
 
+            .lnp-download-action-grid {
+                display: flex;
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 18px;
+            }
+
+            .lnp-download-action-grid .lnp-download-action {
+                margin-top: 0;
+            }
+
             div[data-testid="stDownloadButton"] {
                 margin: 8px 0 24px;
             }
@@ -1035,6 +1068,277 @@ def inject_theme() -> None:
                 letter-spacing: 0;
                 line-height: 1.1;
                 margin: -2px 0 14px;
+            }
+
+            .lnp-overview-intro {
+                animation: lnp-card-arrive 560ms ease-out both;
+                background:
+                    radial-gradient(circle at 12% 0%, rgba(127, 212, 202, 0.34), rgba(127, 212, 202, 0) 34%),
+                    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(215, 242, 238, 0.64)),
+                    #ffffff;
+                border: 1px solid rgba(0, 106, 113, 0.16);
+                border-radius: 8px;
+                box-shadow: 0 18px 42px rgba(0, 106, 113, 0.11);
+                margin: 0 0 22px;
+                padding: 24px 28px;
+                position: relative;
+            }
+
+            .lnp-overview-intro h1 {
+                color: #063638;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: clamp(2rem, 3.4vw, 3.2rem);
+                font-weight: 380;
+                letter-spacing: 0;
+                line-height: 1.05;
+                margin: 0 0 10px;
+            }
+
+            .lnp-overview-intro p {
+                color: #31585c;
+                font-size: 1.05rem;
+                line-height: 1.58;
+                margin: 0;
+                max-width: 1060px;
+            }
+
+            .lnp-chart-label {
+                color: #063638;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 1.22rem;
+                font-weight: 420;
+                letter-spacing: 0;
+                margin: 14px 0 4px;
+            }
+
+            .lnp-chart-note {
+                color: #5c6b70;
+                font-size: 0.9rem;
+                line-height: 1.42;
+                margin: 0 0 10px;
+            }
+
+            .lnp-component-grid {
+                display: grid;
+                gap: 14px;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                margin: 12px 0 26px;
+            }
+
+            .lnp-component-card {
+                animation: lnp-card-arrive 520ms ease-out both;
+                align-content: start;
+                background:
+                    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(215, 242, 238, 0.58)),
+                    #ffffff;
+                border: 1px solid rgba(0, 106, 113, 0.15);
+                border-radius: 8px;
+                box-shadow: 0 12px 30px rgba(0, 106, 113, 0.09);
+                display: grid;
+                gap: 7px;
+                min-height: 118px;
+                overflow: hidden;
+                padding: 17px 17px 16px 20px;
+                position: relative;
+            }
+
+            .lnp-component-card::before {
+                background: linear-gradient(180deg, rgba(0, 106, 113, 0.72), rgba(127, 212, 202, 0.72));
+                bottom: 0;
+                content: "";
+                left: 0;
+                position: absolute;
+                top: 0;
+                width: 4px;
+            }
+
+            .lnp-component-label {
+                color: #006a71;
+                font-size: 0.76rem;
+                font-weight: 760;
+                letter-spacing: 0.08em;
+                margin: 0;
+                text-transform: uppercase;
+            }
+
+            .lnp-component-card h4 {
+                color: #063638;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: 1.08rem;
+                font-weight: 440;
+                letter-spacing: 0;
+                line-height: 1.22;
+                margin: 0;
+                overflow-wrap: anywhere;
+            }
+
+            .lnp-component-ratio {
+                color: #42666a;
+                font-size: 0.96rem;
+                font-weight: 520;
+                line-height: 1.35;
+                margin: 0;
+                overflow-wrap: anywhere;
+            }
+
+            .lnp-bio-panel {
+                animation: lnp-card-arrive 560ms ease-out both;
+                margin: 10px 0 24px;
+                padding: 0;
+                position: relative;
+            }
+
+            .lnp-bio-panel::after {
+                display: none;
+            }
+
+            .lnp-bio-heading {
+                position: relative;
+                z-index: 1;
+            }
+
+            .lnp-bio-heading p {
+                color: #006a71;
+                font-size: 0.78rem;
+                font-weight: 780;
+                letter-spacing: 0.08em;
+                margin: 0 0 5px;
+                text-transform: uppercase;
+            }
+
+            .lnp-bio-heading h3 {
+                color: #063638;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: clamp(1.4rem, 2.4vw, 2.05rem);
+                font-weight: 420;
+                letter-spacing: 0;
+                line-height: 1.12;
+                margin: 0 0 16px;
+            }
+
+            .lnp-bio-card-grid {
+                display: grid;
+                gap: 12px;
+                grid-template-columns: repeat(auto-fit, minmax(270px, 360px));
+                justify-content: start;
+                position: relative;
+                z-index: 1;
+            }
+
+            .lnp-bio-card {
+                background: rgba(255, 255, 255, 0.78);
+                border: 1px solid rgba(0, 106, 113, 0.12);
+                border-radius: 8px;
+                box-shadow: 0 14px 30px rgba(0, 106, 113, 0.1);
+                min-height: 210px;
+                padding: 18px;
+            }
+
+            .lnp-bio-card p {
+                color: #5c6b70;
+                font-size: 0.74rem;
+                font-weight: 720;
+                letter-spacing: 0.07em;
+                line-height: 1.2;
+                margin: 0 0 8px;
+                text-transform: uppercase;
+            }
+
+            .lnp-bio-card h4 {
+                color: #063638;
+                font-family: "HelveticaNeue-Light", "Helvetica Neue", Helvetica, Arial, sans-serif;
+                font-size: clamp(2rem, 3.2vw, 3.1rem);
+                font-weight: 420;
+                letter-spacing: 0;
+                line-height: 1;
+                margin: 0 0 12px;
+                overflow-wrap: anywhere;
+            }
+
+            .lnp-bio-context {
+                color: #42666a;
+                font-size: 0.9rem;
+                line-height: 1.42;
+                min-height: 2.55rem;
+                overflow-wrap: anywhere;
+            }
+
+            .lnp-bio-rank {
+                align-items: baseline;
+                border-top: 1px solid rgba(0, 106, 113, 0.12);
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+                margin-top: 14px;
+                padding-top: 12px;
+            }
+
+            .lnp-bio-rank span {
+                color: #5c6b70;
+                font-size: 0.78rem;
+                font-weight: 700;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+            }
+
+            .lnp-bio-rank strong {
+                color: #063638;
+                font-size: 1rem;
+                font-weight: 760;
+            }
+
+            .lnp-bio-ribbon {
+                background: linear-gradient(90deg, rgba(18, 60, 105, 0.14), rgba(127, 212, 202, 0.24));
+                border-radius: 999px;
+                height: 10px;
+                margin: 13px 0 8px;
+                overflow: visible;
+                position: relative;
+            }
+
+            .lnp-bio-ribbon span {
+                background: linear-gradient(90deg, #006a71, #7fd4ca);
+                border-radius: inherit;
+                display: block;
+                height: 100%;
+                min-width: 2px;
+            }
+
+            .lnp-bio-ribbon i {
+                background: #063638;
+                border: 2px solid #ffffff;
+                border-radius: 50%;
+                box-shadow: 0 4px 10px rgba(0, 35, 38, 0.26);
+                height: 16px;
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: 16px;
+            }
+
+            .lnp-bio-footnote {
+                color: #5c6b70;
+                font-size: 0.8rem;
+                line-height: 1.35;
+            }
+
+            .lnp-structure-frame {
+                align-items: center;
+                background:
+                    radial-gradient(circle at 50% 30%, rgba(215, 242, 238, 0.55), rgba(255,255,255,0) 54%),
+                    #ffffff;
+                border: 1px solid rgba(0, 106, 113, 0.13);
+                border-radius: 8px;
+                box-shadow: 0 16px 36px rgba(0, 106, 113, 0.1);
+                display: flex;
+                justify-content: center;
+                min-height: 460px;
+                overflow: auto;
+                padding: 12px;
+            }
+
+            .lnp-structure-frame svg {
+                max-width: 100%;
             }
 
             .lnp-filter-layer {
@@ -1156,12 +1460,28 @@ def inject_theme() -> None:
                 }
 
                 .lnp-topbar {
-                    align-items: flex-start;
-                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+                    overflow-x: auto;
+                    padding-right: 10px;
+                    position: static;
+                    white-space: nowrap;
                 }
 
                 .lnp-nav {
+                    flex-wrap: nowrap;
                     justify-content: flex-start;
+                    margin-right: 0;
+                }
+
+                .lnp-brand-mark img {
+                    height: 30px;
+                    width: 100px;
+                }
+
+                .lnp-topbar-github img {
+                    height: 26px;
+                    width: 26px;
                 }
 
                 .stTabs [data-baseweb="tab-list"],
@@ -1282,7 +1602,13 @@ def inject_theme() -> None:
 
 def render_top_nav(active: str) -> None:
     logo = logo_data_uri()
+    github_icon = image_data_uri(GITHUB_ICON_PATH)
     logo_html = f'<img src="{logo}" alt="LNP-Hub logo">' if logo else ""
+    github_html = (
+        f'<a class="lnp-topbar-github" href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer" aria-label="Open the LNP-Hub GitHub repository"><img src="{github_icon}" alt=""></a>'
+        if github_icon
+        else ""
+    )
     links = "\n".join(
         f'<a class="{"active" if label == active else ""}" href="{href}" target="_self" rel="self">{label}</a>'
         for label, href in NAV_ITEMS
@@ -1290,16 +1616,13 @@ def render_top_nav(active: str) -> None:
     st.markdown(
         f"""
         <div class="lnp-topbar">
-            <a class="lnp-brand" href="./" target="_self" rel="self">
+            <a class="lnp-brand-mark" href="./?page=Home" target="_self" rel="self" aria-label="LNP-Hub home">
                 {logo_html}
-                <span class="lnp-brand-text">
-                    <span class="lnp-brand-name">LNP-Hub</span>
-                    <span class="lnp-brand-subtitle">Curated nanoparticle commons</span>
-                </span>
             </a>
             <nav class="lnp-nav">
                 {links}
             </nav>
+            {github_html}
         </div>
         """,
         unsafe_allow_html=True,
@@ -1307,11 +1630,7 @@ def render_top_nav(active: str) -> None:
 
 
 def inject_menu_logo() -> None:
-    logo = logo_data_uri()
     slack_icon = image_data_uri(SLACK_ICON_PATH)
-    github_icon = image_data_uri(GITHUB_ICON_PATH)
-    if not logo:
-        return
     slack_link = (
         f'<a class="lnp-menu-slack" href="{SLACK_URL}" target="_blank" rel="noopener noreferrer" aria-label="Join the LNP-Hub Slack community"><img src="{slack_icon}" alt=""></a>'
         if slack_icon
@@ -1322,38 +1641,9 @@ def inject_menu_logo() -> None:
         if slack_link
         else ""
     )
-    menu_github = (
-        f'<a class="lnp-menu-github" href="{GITHUB_URL}" target="_blank" rel="noopener noreferrer" aria-label="Open the LNP-Hub GitHub repository"><img src="{github_icon}" alt=""></a>'
-        if github_icon
-        else ""
-    )
-
-    top_tablist_selector = (
-        '[data-testid="stMainBlockContainer"] > [data-testid="stVerticalBlock"] '
-        '> [data-testid="stTabs"] > div:first-child > div:first-child '
-        '> [role="tablist"]'
-    )
-
     st.markdown(
         f"""
         <style>
-            {top_tablist_selector}::before {{
-                background-image: url("{logo}");
-                background-position: center;
-                background-repeat: no-repeat;
-                background-size: contain;
-                content: "";
-                display: inline-block;
-                flex: 0 0 auto;
-                height: 38px;
-                margin: 0 12px 0 4px;
-                width: 128px;
-            }}
-
-            {top_tablist_selector} {{
-                padding-right: 62px;
-            }}
-
             .lnp-menu-social {{
                 align-items: center;
                 display: flex;
@@ -1381,26 +1671,6 @@ def inject_menu_logo() -> None:
                 transform: translateY(-1px);
             }}
 
-            .lnp-menu-github {{
-                align-items: center;
-                display: inline-flex;
-                justify-content: center;
-                line-height: 0;
-                position: absolute;
-                right: 12px;
-                text-decoration: none;
-                top: 28px;
-                transition: filter 150ms ease, transform 150ms ease;
-                z-index: 80;
-            }}
-
-            .lnp-menu-github:hover {{
-                filter:
-                    drop-shadow(0 8px 9px rgba(0, 20, 22, 0.6))
-                    drop-shadow(0 0 10px rgba(127, 212, 202, 0.48));
-                transform: translateY(-1px);
-            }}
-
             .lnp-menu-slack img {{
                 display: block;
                 filter:
@@ -1410,26 +1680,7 @@ def inject_menu_logo() -> None:
                 width: 118px;
             }}
 
-            .lnp-menu-github img {{
-                display: block;
-                filter:
-                    drop-shadow(0 7px 7px rgba(0, 20, 22, 0.7))
-                    drop-shadow(0 0 9px rgba(127, 212, 202, 0.52));
-                height: 34px;
-                width: 34px;
-            }}
-
             @media (max-width: 720px) {{
-                {top_tablist_selector}::before {{
-                    height: 30px;
-                    margin-right: 8px;
-                    width: 100px;
-                }}
-
-                {top_tablist_selector} {{
-                    padding-right: 44px;
-                }}
-
                 .lnp-menu-social {{
                     bottom: 16px;
                     gap: 7px;
@@ -1440,20 +1691,9 @@ def inject_menu_logo() -> None:
                     height: 84px;
                     width: 84px;
                 }}
-
-                .lnp-menu-github {{
-                    right: 10px;
-                    top: 23px;
-                }}
-
-                .lnp-menu-github img {{
-                    height: 26px;
-                    width: 26px;
-                }}
             }}
         </style>
         {floating_slack}
-        {menu_github}
         """,
         unsafe_allow_html=True,
     )
@@ -1542,10 +1782,11 @@ def render_footer() -> None:
                     </div>
                 </div>
                 <nav class="lnp-footer-links" aria-label="Footer navigation">
-                    <a href="./" target="_self" rel="self">Home</a>
-                    <a href="./Datasets" target="_self" rel="self">Datasets</a>
-                    <a href="./Lipid_Viewer" target="_self" rel="self">Lipid Viewer</a>
-                    <a href="./Documentation" target="_self" rel="self">Documentation</a>
+                    <a href="./?page=Home" target="_self" rel="self">Home</a>
+                    <a href="./?page=Overview" target="_self" rel="self">Overview</a>
+                    <a href="./?page=Datasets" target="_self" rel="self">Datasets</a>
+                    <a href="./?page=Lipid%20Viewer" target="_self" rel="self">Lipid Viewer</a>
+                    <a href="./?page=Documentation" target="_self" rel="self">Documentation</a>
                     {social_links}
                 </nav>
             </div>
