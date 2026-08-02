@@ -239,6 +239,27 @@ def inject_theme() -> None:
                 padding: 0 !important;
             }
 
+            .st-key-top_nav_page,
+            div[class*="st-key-top_nav_page"],
+            .st-key-top_nav_page div[data-testid="stButtonGroup"] {
+                background: transparent !important;
+                border: 0 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .st-key-top_nav_page [aria-label="button group"],
+            div[class*="st-key-top_nav_page"] [aria-label="button group"],
+            .st-key-top_nav_page div[data-testid="stButtonGroup"] > div,
+            div[class*="st-key-top_nav_page"] div[data-testid="stButtonGroup"] > div {
+                align-items: center;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                justify-content: flex-start;
+            }
+
             div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] [role="radiogroup"] {
                 align-items: center;
                 display: flex;
@@ -248,39 +269,79 @@ def inject_theme() -> None:
             }
 
             div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button,
-            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"] {
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"],
+            .st-key-top_nav_page button[kind="pills"],
+            .st-key-top_nav_page button[data-testid="stBaseButton-pills"],
+            div[class*="st-key-top_nav_page"] button[kind="pills"],
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"] {
                 background: transparent !important;
+                background-color: transparent !important;
+                background-image: none !important;
                 border: 1px solid transparent !important;
                 border-radius: 6px;
+                box-shadow: none !important;
                 color: rgba(231, 255, 250, 0.86) !important;
                 font-size: 0.94rem !important;
                 font-weight: 700 !important;
                 min-height: 42px;
+                outline: 0 !important;
                 padding: 10px 14px !important;
                 transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
             }
 
             div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button p,
-            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"] p {
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"] p,
+            .st-key-top_nav_page button[kind="pills"] p,
+            .st-key-top_nav_page button[data-testid="stBaseButton-pills"] p,
+            div[class*="st-key-top_nav_page"] button[kind="pills"] p,
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"] p {
                 color: rgba(231, 255, 250, 0.86) !important;
                 font-weight: 700 !important;
             }
 
             div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button:hover,
-            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"]:hover {
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pills"]:hover,
+            .st-key-top_nav_page button[kind="pills"]:hover,
+            .st-key-top_nav_page button[data-testid="stBaseButton-pills"]:hover,
+            div[class*="st-key-top_nav_page"] button[kind="pills"]:hover,
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pills"]:hover {
                 background: rgba(127, 212, 202, 0.13) !important;
+                background-color: rgba(127, 212, 202, 0.13) !important;
+                background-image: none !important;
                 color: #dffff9 !important;
             }
 
             div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button[aria-pressed="true"],
             div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) div[data-testid="stPills"] button[data-checked="true"],
-            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pillsActive"] {
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pillsActive"],
+            .st-key-top_nav_page button[kind="pillsActive"],
+            .st-key-top_nav_page button[data-testid="stBaseButton-pillsActive"],
+            .st-key-top_nav_page button[aria-pressed="true"],
+            .st-key-top_nav_page button[aria-selected="true"],
+            .st-key-top_nav_page button[aria-checked="true"],
+            div[class*="st-key-top_nav_page"] button[kind="pillsActive"],
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pillsActive"],
+            div[class*="st-key-top_nav_page"] button[aria-pressed="true"],
+            div[class*="st-key-top_nav_page"] button[aria-selected="true"],
+            div[class*="st-key-top_nav_page"] button[aria-checked="true"] {
                 background: linear-gradient(135deg, #d7f2ee, #83dfd2) !important;
+                background-color: #d7f2ee !important;
                 color: #063638 !important;
                 box-shadow: 0 7px 18px rgba(131, 223, 210, 0.34) !important;
+                outline: 0 !important;
             }
 
-            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pillsActive"] p {
+            div[data-testid="stHorizontalBlock"]:has(.lnp-smooth-brand) button[data-testid="stBaseButton-pillsActive"] p,
+            .st-key-top_nav_page button[kind="pillsActive"] p,
+            .st-key-top_nav_page button[data-testid="stBaseButton-pillsActive"] p,
+            .st-key-top_nav_page button[aria-pressed="true"] p,
+            .st-key-top_nav_page button[aria-selected="true"] p,
+            .st-key-top_nav_page button[aria-checked="true"] p,
+            div[class*="st-key-top_nav_page"] button[kind="pillsActive"] p,
+            div[class*="st-key-top_nav_page"] button[data-testid="stBaseButton-pillsActive"] p,
+            div[class*="st-key-top_nav_page"] button[aria-pressed="true"] p,
+            div[class*="st-key-top_nav_page"] button[aria-selected="true"] p,
+            div[class*="st-key-top_nav_page"] button[aria-checked="true"] p {
                 color: #063638 !important;
                 font-weight: 700 !important;
             }
